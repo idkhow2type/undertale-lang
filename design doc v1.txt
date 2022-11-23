@@ -1,12 +1,8 @@
 pink => none
 red => block, turn right
 yellow => block, flip dir
-purple => go and activate next cell in dir entered, flavor = orange
-green
-	- enter from left: ptr++
-	- enter from right: ptr--
-	- enter from below: val++
-	- enter from above: val--
+purple => go and activate next cell in dir entered, flavor = lemon
+green => converts neighbor pink tiles to yellow and vice versa
 orange => if val = 0, flavor = orange
 blue => if flavor = orange or touching yellow, acts like yellow
 
