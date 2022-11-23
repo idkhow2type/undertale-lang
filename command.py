@@ -3,29 +3,6 @@ import numpy as np
 import tiles
 
 
-class InstructionPointer:
-    def __init__(self, x, y, direction, flavor) -> None:
-        self.x = x
-        self.y = y
-        self.direction = direction
-        self.vec = consts.DIRS[self.direction]
-        self.flavor = flavor
-
-    def move(self, level: np.ndarray[tiles.Tile]):
-        self.x += self.vec[0]
-        self.y += self.vec[1]
-
-        level[self.y, self.x].activate()
-
-    def turn(self):
-        self.direction = (self.direction + 1) % len(consts.DIRS)
-        self.vec = consts.DIRS[self.direction]
-
-    def unmove(self):
-        self.x -= self.vec[0]
-        self.y -= self.vec[1]
-
-
 class Level:
     def __init__(self, image) -> None:
         self.image = image
@@ -49,7 +26,7 @@ class Level:
             if self.map[iy, ix] == "green":
                 self.map[iy, ix] = tiles.Green(ix, iy)
             if self.map[iy, ix] == "orange":
-                self.map[iy, ix] = tiles.Orange(ix, iy) 
+                self.map[iy, ix] = tiles.Orange(ix, iy)
             if self.map[iy, ix] == "blue":
                 self.map[iy, ix] = tiles.Blue(ix, iy)
 
@@ -59,3 +36,29 @@ class Level:
 
         for ip in self.ips:
             ip.move(self.map)
+
+    def end(self):
+        quit()
+
+
+class InstructionPointer:
+    def __init__(self, x, y, direction, flavor) -> None:
+        self.x = x
+        self.y = y
+        self.direction = direction
+        self.vec = consts.DIRS[self.direction]
+        self.flavor = flavor
+
+    def move(self, level: Level):
+        self.x += self.vec[0]
+        self.y += self.vec[1]
+
+        level[self.y, self.x].activate(self, level)
+
+    def turn(self):
+        self.direction = (self.direction + 1) % len(consts.DIRS)
+        self.vec = consts.DIRS[self.direction]
+
+    def unmove(self):
+        self.x -= self.vec[0]
+        self.y -= self.vec[1]

@@ -9,7 +9,7 @@ class Tile:
         self.y = y
         self.color = color
 
-    def activate(self, ip):
+    def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         pass
 
     def update(self):
@@ -25,7 +25,7 @@ class Red(Tile):
     def __init__(self, x, y) -> None:
         super().__init__(x, y, "red")
 
-    def activate(self, ip: cmd.InstructionPointer):
+    def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         ip.unmove()
         ip.turn()
 
@@ -34,7 +34,7 @@ class Yellow(Tile):
     def __init__(self, x, y) -> None:
         super().__init__(x, y, "yellow")
 
-    def activate(self, ip: cmd.InstructionPointer):
+    def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         ip.unmove()
         ip.turn()
         ip.turn()
@@ -44,7 +44,7 @@ class Purple(Tile):
     def __init__(self, x, y) -> None:
         super().__init__(x, y, "purple")
 
-    def activate(self, ip: cmd.InstructionPointer):
+    def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         ip.move()
         ip.flavor = "lemon"
 
@@ -66,7 +66,7 @@ class Orange(Tile):
     def __init__(self, x, y) -> None:
         super().__init__(x, y, "orange")
 
-    def activate(self, ip: cmd.InstructionPointer):
+    def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         ip.flavor = "orange"
 
 
@@ -92,6 +92,14 @@ class Start(Tile):
 class End(Tile):
     def __init__(self, x, y) -> None:
         super().__init__(x, y, "end")
+
+    def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
+        level.end()
+
+
+class Empty(Tile):
+    def __init__(self, x, y) -> None:
+        super().__init__(x, y, "empty")
 
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         level.ips.remove(ip)
