@@ -56,10 +56,10 @@ class Green(Tile):
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         for vec in consts.DIRS:
             pos = (self.y + vec[0], self.x + vec[1])
-            if level.map[pos].color == "pink":
-                level.map[pos] = Yellow(pos[1], pos[0])
-            if level.map[pos].color == "yellow":
-                level.map[pos] = Pink(pos[1], pos[0])
+            if level.grid[pos].color == "pink":
+                level.grid[pos] = Yellow(pos[1], pos[0])
+            if level.grid[pos].color == "yellow":
+                level.grid[pos] = Pink(pos[1], pos[0])
 
 
 class Orange(Tile):
@@ -75,8 +75,9 @@ class Blue(Tile):
         super().__init__(x, y, "blue")
 
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
+        # TODO: floodfill
         touching_yellow = any(
-            [level.map[self.y + vec[1], self.x + vec[0]] for vec in consts.DIRS]
+            [level.grid[self.y + vec[1], self.x + vec[0]] for vec in consts.DIRS]
         )
         if ip.flavor == "orange" or touching_yellow:
             ip.unmove()
