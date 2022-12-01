@@ -1,7 +1,7 @@
 import consts
 import numpy as np
-import tiles
 from PIL import Image
+from pprint import pprint
 
 
 class InstructionPointer:
@@ -29,29 +29,30 @@ class InstructionPointer:
 
 class Level:
     def __init__(self, image: Image) -> None:
+        import tiles
+
+        img_arr = np.array(image)
         self.image = image
-        self.grid = np.asarray(image)
+        self.grid = np.empty(
+            shape=(img_arr.shape[0], img_arr.shape[1]), dtype=tiles.Tile
+        )
         self.ips = []
         self.ticks = 0
-        self.start = tiles.Start(1, 1)
-        self.end = self.grid[(s - 2 for s in self.grid.shape)]
 
-        self.grid[1, 1] = self.start
-        self.grid[self.end.y, self.end.x] = self.end
-        for iy, ix in np.ndindex(self.grid.shape):
-            if self.grid[iy, ix] == consts.COLORS["pink"]:
+        for iy, ix, _ in np.ndindex(img_arr.shape):
+            if np.all(img_arr[iy, ix] == consts.COLORS["pink"]):
                 self.grid[iy, ix] = tiles.Pink(ix, iy)
-            elif self.grid[iy, ix] == consts.COLORS["red"]:
+            elif np.all(img_arr[iy, ix] == consts.COLORS["red"]):
                 self.grid[iy, ix] = tiles.Red(ix, iy)
-            elif self.grid[iy, ix] == consts.COLORS["yellow"]:
+            elif np.all(img_arr[iy, ix] == consts.COLORS["yellow"]):
                 self.grid[iy, ix] = tiles.Yellow(ix, iy)
-            elif self.grid[iy, ix] == consts.COLORS["purple"]:
+            elif np.all(img_arr[iy, ix] == consts.COLORS["purple"]):
                 self.grid[iy, ix] = tiles.Purple(ix, iy)
-            elif self.grid[iy, ix] == consts.COLORS["green"]:
+            elif np.all(img_arr[iy, ix] == consts.COLORS["green"]):
                 self.grid[iy, ix] = tiles.Green(ix, iy)
-            elif self.grid[iy, ix] == consts.COLORS["orange"]:
+            elif np.all(img_arr[iy, ix] == consts.COLORS["orange"]):
                 self.grid[iy, ix] = tiles.Orange(ix, iy)
-            elif self.grid[iy, ix] == consts.COLORS["blue"]:
+            elif np.all(img_arr[iy, ix] == consts.COLORS["blue"]):
                 self.grid[iy, ix] = tiles.Blue(ix, iy)
             else:
                 self.grid[iy, ix] = tiles.Empty(ix, iy)
