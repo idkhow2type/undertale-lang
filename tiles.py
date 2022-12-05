@@ -11,9 +11,6 @@ class Tile:
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         pass
 
-    def update(self):
-        pass
-
 
 class Pink(Tile):
     def __init__(self, x, y) -> None:

@@ -38,7 +38,9 @@ class Level:
         )
         self.ips = []
         self.ticks = 0
+        self.yellows = {}
 
+        greens = []
         for iy, ix, _ in np.ndindex(img_arr.shape):
             if np.all(img_arr[iy, ix] == consts.COLORS["pink"]):
                 self.grid[iy, ix] = tiles.Pink(ix, iy)
@@ -46,10 +48,12 @@ class Level:
                 self.grid[iy, ix] = tiles.Red(ix, iy)
             elif np.all(img_arr[iy, ix] == consts.COLORS["yellow"]):
                 self.grid[iy, ix] = tiles.Yellow(ix, iy)
+                self.yellows[(iy, ix)] = []
             elif np.all(img_arr[iy, ix] == consts.COLORS["purple"]):
                 self.grid[iy, ix] = tiles.Purple(ix, iy)
             elif np.all(img_arr[iy, ix] == consts.COLORS["green"]):
                 self.grid[iy, ix] = tiles.Green(ix, iy)
+                greens.append((iy, ix))
             elif np.all(img_arr[iy, ix] == consts.COLORS["orange"]):
                 self.grid[iy, ix] = tiles.Orange(ix, iy)
             elif np.all(img_arr[iy, ix] == consts.COLORS["blue"]):
@@ -57,15 +61,40 @@ class Level:
             else:
                 self.grid[iy, ix] = tiles.Empty(ix, iy)
 
+        for tile in greens:
+            for vec in consts.DIRS:
+                y = tile[0] + vec[0]
+                x = tile[1] + vec[1]
+                if self.grid[y, x].color == "pink":
+                    self.yellows[(y, x)] = []
+
+        for tile in self.yellows.keys():
+            self.yellows[tile] = list(self.get_same_colors(tile, "blue"))
+
+        pprint(self.yellows)
+
+    def get_same_colors(self, root_tile: tuple, color: str, tiles: set = set()):
+        neighbors = []
+
+        for vec in consts.DIRS:
+            y = root_tile[0] + vec[0]
+            x = root_tile[1] + vec[1]
+
+            if (y, x) not in tiles and self.grid[y, x].color == color:
+                neighbors.append((y, x))
+                tiles.add((y, x))
+
+        for tile in neighbors:
+            tiles.union(self.get_same_colors(tile, color, tiles))
+
+        return tiles
+
     def tick(self):
         if self.ticks % 2 == 0:
             self.ips.append(InstructionPointer(1, 1, 0, None))
 
         for ip in self.ips:
             ip.move(self.grid)
-
-    def show(self):
-        self.grid
 
     def end(self):
         quit()
