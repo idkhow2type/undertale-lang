@@ -1,6 +1,7 @@
 import command as cmd
 import consts
 
+# TODO: swap x, y order
 
 class Tile:
     def __init__(self, x, y, color) -> None:
@@ -91,7 +92,7 @@ class End(Tile):
         super().__init__(x, y, "end")
 
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
-        level.end()
+        level.stop()
 
 
 class Empty(Tile):

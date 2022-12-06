@@ -1,6 +1,6 @@
 import consts
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from pprint import pprint
 
 
@@ -12,11 +12,11 @@ class InstructionPointer:
         self.vec = consts.DIRS[self.direction]
         self.flavor = flavor
 
-    def move(self, grid):
+    def move(self, level):
         self.x += self.vec[0]
         self.y += self.vec[1]
 
-        grid[self.y, self.x].activate(self, grid)
+        level.grid[self.y, self.x].activate(self, level)
 
     def turn(self):
         self.direction = (self.direction + 1) % len(consts.DIRS)
@@ -29,7 +29,14 @@ class InstructionPointer:
 
 class Level:
     def __init__(self, image: Image) -> None:
+        import tiles
+
+        self.image = image
         self.parse_image(image)
+        self.start = (1, 1)
+        self.end = (1, self.grid.shape[1] - 2)
+        self.grid[self.start] = tiles.Start(self.start[1], self.start[0])
+        self.grid[self.end] = tiles.End(self.end[1], self.end[0])
         self.ips = []
         self.ticks = 0
         self.yellows = {}
@@ -89,11 +96,33 @@ class Level:
         return neighbors
 
     def tick(self):
-        if self.ticks % 2 == 0:
-            self.ips.append(InstructionPointer(1, 1, 0, None))
-
         for ip in self.ips:
-            ip.move(self.grid)
+            ip.move(self)
 
-    def end(self):
+        if self.ticks % 2 == 0:
+            self.ips.append(InstructionPointer(self.start[1], self.start[0], 0, None))
+
+        self.ticks += 1
+
+    def stop(self):
+        print("quitting...")
+        self.show()
         quit()
+
+    def show(self, scale=5):
+        image = self.image.resize(
+            (self.image.size[0] * scale, self.image.size[1] * scale),
+            resample=Image.Resampling.BOX,
+        )
+        draw = ImageDraw.Draw(image)
+        for ip in self.ips:
+            bound = (
+                ip.x * scale + 1,
+                ip.y * scale + 1,
+                (ip.x + 1) * scale - 2,
+                (ip.y + 1) * scale - 2,
+            )
+            draw.ellipse(
+                bound, fill=(196, 79, 0) if ip.flavor == "orange" else (106, 47, 106)
+            )
+        image.show()

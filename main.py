@@ -4,5 +4,15 @@ from command import Level
 from pprint import pprint
 
 image = Image.open('demo.png')
+
 level = Level(image)
-pprint(vars(level))
+level.show()
+
+level.tick()
+level.show()
+
+level.tick()
+level.show()
+
+level.tick()
+level.show()
