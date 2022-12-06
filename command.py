@@ -29,49 +29,48 @@ class InstructionPointer:
 
 class Level:
     def __init__(self, image: Image) -> None:
-        import tiles
-
-        img_arr = np.array(image)
-        self.image = image
-        self.grid = np.empty(
-            shape=(img_arr.shape[0], img_arr.shape[1]), dtype=tiles.Tile
-        )
+        self.parse_image(image)
         self.ips = []
         self.ticks = 0
         self.yellows = {}
+        self.get_yellows()
 
-        greens = []
-        for iy, ix, _ in np.ndindex(img_arr.shape):
-            if np.all(img_arr[iy, ix] == consts.COLORS["pink"]):
+    def parse_image(self, image: Image):
+        import tiles
+
+        self.img_arr = np.array(image)
+        self.grid = np.empty(
+            shape=(self.img_arr.shape[0], self.img_arr.shape[1]), dtype=tiles.Tile
+        )
+
+        for iy, ix, _ in np.ndindex(self.img_arr.shape):
+            if np.all(self.img_arr[iy, ix] == consts.COLORS["pink"]):
                 self.grid[iy, ix] = tiles.Pink(ix, iy)
-            elif np.all(img_arr[iy, ix] == consts.COLORS["red"]):
+            elif np.all(self.img_arr[iy, ix] == consts.COLORS["red"]):
                 self.grid[iy, ix] = tiles.Red(ix, iy)
-            elif np.all(img_arr[iy, ix] == consts.COLORS["yellow"]):
+            elif np.all(self.img_arr[iy, ix] == consts.COLORS["yellow"]):
                 self.grid[iy, ix] = tiles.Yellow(ix, iy)
-                self.yellows[(iy, ix)] = []
-            elif np.all(img_arr[iy, ix] == consts.COLORS["purple"]):
+            elif np.all(self.img_arr[iy, ix] == consts.COLORS["purple"]):
                 self.grid[iy, ix] = tiles.Purple(ix, iy)
-            elif np.all(img_arr[iy, ix] == consts.COLORS["green"]):
+            elif np.all(self.img_arr[iy, ix] == consts.COLORS["green"]):
                 self.grid[iy, ix] = tiles.Green(ix, iy)
-                greens.append((iy, ix))
-            elif np.all(img_arr[iy, ix] == consts.COLORS["orange"]):
+            elif np.all(self.img_arr[iy, ix] == consts.COLORS["orange"]):
                 self.grid[iy, ix] = tiles.Orange(ix, iy)
-            elif np.all(img_arr[iy, ix] == consts.COLORS["blue"]):
+            elif np.all(self.img_arr[iy, ix] == consts.COLORS["blue"]):
                 self.grid[iy, ix] = tiles.Blue(ix, iy)
             else:
                 self.grid[iy, ix] = tiles.Empty(ix, iy)
 
-        for tile in greens:
-            for vec in consts.DIRS:
-                y = tile[0] + vec[0]
-                x = tile[1] + vec[1]
-                if self.grid[y, x].color == "pink":
-                    self.yellows[(y, x)] = []
-
-        for tile in self.yellows.keys():
-            self.yellows[tile] = self.get_same_colors(tile, "blue")
-
-        pprint(self.yellows)
+    def get_yellows(self):
+        for iy, ix in np.ndindex(self.grid.shape):
+            if self.grid[iy, ix].color == "yellow":
+                self.yellows[(iy, ix)] = self.get_same_colors((iy, ix), "blue")
+            elif self.grid[iy, ix].color == "green":
+                for vec in consts.DIRS:
+                    y = iy + vec[0]
+                    x = ix + vec[1]
+                    if self.grid[y, x].color == "pink":
+                        self.yellows[(y, x)] = self.get_same_colors((iy, ix), "blue")
 
     def get_same_colors(self, root_tile: tuple, color: str, tiles: list = []):
         neighbors = []
