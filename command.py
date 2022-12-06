@@ -69,11 +69,11 @@ class Level:
                     self.yellows[(y, x)] = []
 
         for tile in self.yellows.keys():
-            self.yellows[tile] = list(self.get_same_colors(tile, "blue"))
+            self.yellows[tile] = self.get_same_colors(tile, "blue")
 
         pprint(self.yellows)
 
-    def get_same_colors(self, root_tile: tuple, color: str, tiles: set = set()):
+    def get_same_colors(self, root_tile: tuple, color: str, tiles: list = []):
         neighbors = []
 
         for vec in consts.DIRS:
@@ -82,12 +82,12 @@ class Level:
 
             if (y, x) not in tiles and self.grid[y, x].color == color:
                 neighbors.append((y, x))
-                tiles.add((y, x))
 
+        tiles.extend(neighbors)
         for tile in neighbors:
-            tiles.union(self.get_same_colors(tile, color, tiles))
+            neighbors.extend(self.get_same_colors(tile, color, tiles))
 
-        return tiles
+        return neighbors
 
     def tick(self):
         if self.ticks % 2 == 0:
