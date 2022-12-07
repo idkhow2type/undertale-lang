@@ -31,7 +31,6 @@ class Level:
     def __init__(self, image: Image) -> None:
         import tiles
 
-        self.image = image
         self.parse_image(image)
         self.start = (1, 1)
         self.end = (1, self.grid.shape[1] - 2)
@@ -44,6 +43,8 @@ class Level:
 
     def parse_image(self, image: Image):
         import tiles
+
+        # TODO: dynamically generate image from self.grid
 
         self.img_arr = np.array(image)
         self.grid = np.empty(
@@ -67,6 +68,16 @@ class Level:
                 self.grid[iy, ix] = tiles.Blue(iy, ix)
             else:
                 self.grid[iy, ix] = tiles.Empty(iy, ix)
+
+        self.image = self.create_image()
+
+    def create_image(self):
+        image = Image.new(mode="RGB", size=self.image.size)
+        pixels = image.load()
+        for y, x in np.ndindex(self.grid.shape):
+            # TODO: change color consts to tuple
+            pixels[x, y] = tuple(consts.COLORS[self.grid[y, x].color])
+        return image
 
     def get_yellows(self):
         for iy, ix in np.ndindex(self.grid.shape):
