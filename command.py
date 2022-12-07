@@ -76,7 +76,7 @@ class Level:
                     y = iy + vec[0]
                     x = ix + vec[1]
                     if self.grid[y, x].color == "pink":
-                        self.yellows[(y, x)] = self.get_same_colors((iy, ix), "blue")
+                        self.yellows[(y, x)] = self.get_same_colors((y, x), "blue")
 
     def get_same_colors(self, root_tile: tuple, color: str, tiles: list = []):
         neighbors = []

@@ -52,7 +52,6 @@ class Green(Tile):
         super().__init__(y, x, "green")
 
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
-        print('activate')
         for vec in consts.DIRS:
             pos = (self.y + vec[0], self.x + vec[1])
             if level.grid[pos].color == "pink":
