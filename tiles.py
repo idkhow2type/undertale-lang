@@ -57,7 +57,7 @@ class Green(Tile):
             pos = (self.y + vec[0], self.x + vec[1])
             if level.grid[pos].color == "pink":
                 level.grid[pos] = Yellow(pos[0], pos[1])
-            if level.grid[pos].color == "yellow":
+            elif level.grid[pos].color == "yellow":
                 level.grid[pos] = Pink(pos[0], pos[1])
 
 
@@ -84,12 +84,12 @@ class Blue(Tile):
 
 class Start(Tile):
     def __init__(self, y, x) -> None:
-        super().__init__(y, x, "start")
+        super().__init__(y, x, "white")
 
 
 class End(Tile):
     def __init__(self, y, x) -> None:
-        super().__init__(y, x, "end")
+        super().__init__(y, x, "white")
 
     def activate(self, ip: cmd.InstructionPointer, level: cmd.Level):
         level.stop()

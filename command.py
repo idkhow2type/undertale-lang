@@ -44,8 +44,6 @@ class Level:
     def parse_image(self, image: Image):
         import tiles
 
-        # TODO: dynamically generate image from self.grid
-
         self.img_arr = np.array(image)
         self.grid = np.empty(
             shape=(self.img_arr.shape[0], self.img_arr.shape[1]), dtype=tiles.Tile
@@ -68,16 +66,6 @@ class Level:
                 self.grid[iy, ix] = tiles.Blue(iy, ix)
             else:
                 self.grid[iy, ix] = tiles.Empty(iy, ix)
-
-        self.image = self.create_image()
-
-    def create_image(self):
-        image = Image.new(mode="RGB", size=self.image.size)
-        pixels = image.load()
-        for y, x in np.ndindex(self.grid.shape):
-            # TODO: change color consts to tuple
-            pixels[x, y] = tuple(consts.COLORS[self.grid[y, x].color])
-        return image
 
     def get_yellows(self):
         for iy, ix in np.ndindex(self.grid.shape):
@@ -121,16 +109,23 @@ class Level:
 
     def stop(self):
         print("quitting...")
-        self.show()
+        self.create_image().show()
         quit()
 
-    def show(self, scale=5):
+    def create_image(self, scale=5):
         min_scale = 4
 
         if scale < min_scale:
             raise ValueError(f"Scale must be greater or equal to {min_scale}")
-        image = self.image.resize(
-            (self.image.size[0] * scale, self.image.size[1] * scale),
+
+        image = Image.new(mode="RGB", size=self.grid.shape[::-1])
+        pixels = image.load()
+        for y, x in np.ndindex(self.grid.shape):
+            # TODO: change color consts to tuple
+            pixels[x, y] = tuple(consts.COLORS[self.grid[y, x].color])
+
+        image = image.resize(
+            (image.size[0] * scale, image.size[1] * scale),
             resample=Image.Resampling.BOX,
         )
         draw = ImageDraw.Draw(image)
@@ -144,4 +139,5 @@ class Level:
             draw.ellipse(
                 bound, fill=(196, 79, 0) if ip.flavor == "orange" else (106, 47, 106)
             )
-        image.show()
+
+        return image
