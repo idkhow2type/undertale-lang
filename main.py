@@ -6,13 +6,6 @@ from pprint import pprint
 image = Image.open('demo.png')
 
 level = Level(image)
-level.show()
-
-level.tick()
-level.show()
-
-level.tick()
-level.show()
-
-level.tick()
-level.show()
+while True:
+    level.tick()
+    level.show(scale=20)

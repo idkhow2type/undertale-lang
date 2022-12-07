@@ -5,16 +5,16 @@ from pprint import pprint
 
 
 class InstructionPointer:
-    def __init__(self, x: int, y: int, direction: int, flavor: str) -> None:
-        self.x = x
+    def __init__(self, y: int, x: int, direction: int, flavor: str) -> None:
         self.y = y
+        self.x = x
         self.direction = direction
         self.vec = consts.DIRS[self.direction]
         self.flavor = flavor
 
     def move(self, level):
-        self.x += self.vec[0]
-        self.y += self.vec[1]
+        self.y += self.vec[0]
+        self.x += self.vec[1]
 
         level.grid[self.y, self.x].activate(self, level)
 
@@ -23,8 +23,8 @@ class InstructionPointer:
         self.vec = consts.DIRS[self.direction]
 
     def unmove(self):
-        self.x -= self.vec[0]
-        self.y -= self.vec[1]
+        self.y -= self.vec[0]
+        self.x -= self.vec[1]
 
 
 class Level:
@@ -35,8 +35,8 @@ class Level:
         self.parse_image(image)
         self.start = (1, 1)
         self.end = (1, self.grid.shape[1] - 2)
-        self.grid[self.start] = tiles.Start(self.start[1], self.start[0])
-        self.grid[self.end] = tiles.End(self.end[1], self.end[0])
+        self.grid[self.start] = tiles.Start(self.start[0], self.start[1])
+        self.grid[self.end] = tiles.End(self.end[0], self.end[1])
         self.ips = []
         self.ticks = 0
         self.yellows = {}
@@ -52,21 +52,21 @@ class Level:
 
         for iy, ix, _ in np.ndindex(self.img_arr.shape):
             if np.all(self.img_arr[iy, ix] == consts.COLORS["pink"]):
-                self.grid[iy, ix] = tiles.Pink(ix, iy)
+                self.grid[iy, ix] = tiles.Pink(iy, ix)
             elif np.all(self.img_arr[iy, ix] == consts.COLORS["red"]):
-                self.grid[iy, ix] = tiles.Red(ix, iy)
+                self.grid[iy, ix] = tiles.Red(iy, ix)
             elif np.all(self.img_arr[iy, ix] == consts.COLORS["yellow"]):
-                self.grid[iy, ix] = tiles.Yellow(ix, iy)
+                self.grid[iy, ix] = tiles.Yellow(iy, ix)
             elif np.all(self.img_arr[iy, ix] == consts.COLORS["purple"]):
-                self.grid[iy, ix] = tiles.Purple(ix, iy)
+                self.grid[iy, ix] = tiles.Purple(iy, ix)
             elif np.all(self.img_arr[iy, ix] == consts.COLORS["green"]):
-                self.grid[iy, ix] = tiles.Green(ix, iy)
+                self.grid[iy, ix] = tiles.Green(iy, ix)
             elif np.all(self.img_arr[iy, ix] == consts.COLORS["orange"]):
-                self.grid[iy, ix] = tiles.Orange(ix, iy)
+                self.grid[iy, ix] = tiles.Orange(iy, ix)
             elif np.all(self.img_arr[iy, ix] == consts.COLORS["blue"]):
-                self.grid[iy, ix] = tiles.Blue(ix, iy)
+                self.grid[iy, ix] = tiles.Blue(iy, ix)
             else:
-                self.grid[iy, ix] = tiles.Empty(ix, iy)
+                self.grid[iy, ix] = tiles.Empty(iy, ix)
 
     def get_yellows(self):
         for iy, ix in np.ndindex(self.grid.shape):
@@ -96,11 +96,15 @@ class Level:
         return neighbors
 
     def tick(self):
+        for k, v in self.yellows.items():
+            for tile in v:
+                self.grid[tile].electrified = self.grid[k].color == "yellow"
+
         for ip in self.ips:
             ip.move(self)
 
         if self.ticks % 2 == 0:
-            self.ips.append(InstructionPointer(self.start[1], self.start[0], 0, None))
+            self.ips.append(InstructionPointer(self.start[0], self.start[1], 0, None))
 
         self.ticks += 1
 
@@ -110,6 +114,10 @@ class Level:
         quit()
 
     def show(self, scale=5):
+        min_scale = 4
+
+        if scale < min_scale:
+            raise ValueError(f"Scale must be greater or equal to {min_scale}")
         image = self.image.resize(
             (self.image.size[0] * scale, self.image.size[1] * scale),
             resample=Image.Resampling.BOX,
